@@ -33,7 +33,7 @@ XBMCADDON = dfatmo-xbmc-addon.zip
 XBMCADDONWIN = dfatmo-xbmc-addon-win.zip
 XBMCADDONFILES = dfatmo.py addon.xml settings.xml mydriver.py icon.png
 
-OUTPUTDRIVERS = dfatmo-file.so dfatmo-serial.so
+OUTPUTDRIVERS = dfatmo-file.so dfatmo-serial.so dfatmo-artnet.so
 
 XINEPOSTATMO = xineplug_post_dfatmo.so
 
@@ -63,7 +63,7 @@ endif
 
 ifneq (NO, $(shell pkg-config libusb-1.0 || echo NO))
 HAVE_LIBUSB=1
-OUTPUTDRIVERS += dfatmo-df10ch.so
+OUTPUTDRIVERS += dfatmo-df10ch.so dfatmo-udmx.so
 CFLAGS_USB ?= $(shell pkg-config --cflags libusb-1.0)
 LIBS_USB ?= $(shell pkg-config --libs libusb-1.0)
 endif
@@ -144,6 +144,15 @@ dfatmo-df10ch.so: dfatmo-df10ch.o
 	$(CC) $(CFLAGS_USB) $(CFLAGS) $(LDFLAGS_SO) $(LIBS_USB) -lm -o $@ $<
 
 dfatmo-file.o: fileoutputdriver.c dfatmo.h
+	$(CC) $(CFLAGS) -c -o $@ $<
+	
+dfatmo-udmx.o: udmxoutputdriver.c dfatmo.h
+	$(CC) $(CFLAGS_USB) $(CFLAGS) -c -o $@ $<
+
+dfatmo-udmx.so: dfatmo-udmx.o
+	$(CC) $(CFLAGS_USB) $(CFLAGS) $(LDFLAGS_SO) $(LIBS_USB) -lm -o $@ $<
+
+dfatmo-artnet.o: artnetoutputdriver.c dfatmo.h
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 dfatmo-serial.o: serialoutputdriver.c dfatmo.h
